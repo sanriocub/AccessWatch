@@ -82,12 +82,12 @@ The one shared file everyone touches is `AccessibilityReport.cs` (the model) —
 You can do this either with the buttons in Visual Studio, or with the terminal commands — both do the same thing.
 
 **🟢 Every time before you start working — pull first:**
-- **VS button:** open **Git** panel
-  1. press **Pull**
+- **VS button:** open **Git** panel --> press **Pull**
 
 **OR**
 
 - **Terminal:** `git pull origin main`
+
 
 
 **🛑 Always pull before pushing.** If you skip this, it could cause conflicts and overwrite someone else's work.
