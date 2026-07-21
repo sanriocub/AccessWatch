@@ -82,7 +82,8 @@ The one shared file everyone touches is `AccessibilityReport.cs` (the model) —
 You can do this either with the buttons in Visual Studio, or with the terminal commands — both do the same thing.
 
 **🟢 Every time before you start working — pull first:**
-- **VS button:** bottom status bar → click the branch name / sync icon (down arrow) → **Pull**, or **Git menu → Pull**
+- **VS button:** open **Git** panel
+  1. press **Pull**
 
 **OR**
 
@@ -91,8 +92,13 @@ You can do this either with the buttons in Visual Studio, or with the terminal c
 
 **🛑 Always pull before pushing.** If you skip this, it could cause conflicts and overwrite someone else's work.
 
-**When you're done with a change — commit and push:**
-- **VS button:** open **Git Changes** panel (**View → Git Changes** — it also pops up automatically when you have unsaved/uncommitted changes) → type your commit message in the box at the top → click **Commit All**, then click **Push** (some VS versions show a single **"Commit All and Push"** button)
+**When you're done with a change — commit and push:** everytime when youre done editing
+- **VS button:** open **Git** panel 
+1. press commit or stash
+2. write whate you edited
+3. press commit all
+4. sync
+
 
 **OR**
 
