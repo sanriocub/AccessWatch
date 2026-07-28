@@ -1,0 +1,35 @@
+﻿@model AccessWatch.ViewModels.SubmitReportViewModel
+@{
+    ViewData["Title"] = "Submit a report";
+}
+
+<h2>Report an accessibility barrier</h2>
+
+<form asp-controller="Report" asp-action="Submit" method="post" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Location"></label>
+        <input asp-for="Location" class="form-control" placeholder="e.g. Riverside Community Hall" />
+        <span asp-validation-for="Location" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Description"></label>
+        <textarea asp-for="Description" class="form-control" rows="4" placeholder="Describe the barrier you encountered"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Image"></label>
+        <input asp-for="Image" type="file" class="form-control" accept="image/*" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit report</button>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

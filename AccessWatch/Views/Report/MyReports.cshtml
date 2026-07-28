@@ -1,0 +1,37 @@
+﻿@model List<AccessWatch.Models.AccessibilityReport>
+@{
+    ViewData["Title"] = "My reports";
+}
+
+<h2>My reports</h2>
+
+<a asp-controller="Report" asp-action="Submit" class="btn btn-primary mb-3">Submit a new report</a>
+
+@if (!Model.Any())
+{
+    <p>You haven't submitted any reports yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Submitted</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var report in Model)
+            {
+                <tr>
+                    <td>@report.SubmittedAt.ToLocalTime().ToString("g")</td>
+                    <td>@(report.Description.Length > 60 ? report.Description.Substring(0, 60) + "..." : report.Description)</td>
+                    <td><span class="badge bg-secondary">@report.Status</span></td>
+                    <td><a asp-controller="Report" asp-action="Details" asp-route-id="@report.ReportId">View</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
