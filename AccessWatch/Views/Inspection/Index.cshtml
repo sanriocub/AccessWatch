@@ -1,0 +1,52 @@
+﻿@model IEnumerable<AccessWatch.Models.AccessibilityReport>
+
+@{
+    ViewData["Title"] = "Assigned Cases";
+}
+
+<h2>Assigned Cases</h2>
+
+<p>Accessibility reports currently assigned to you for inspection.</p>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        No assigned cases are currently available.
+    </div>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Report ID</th>
+                <th>Submitted By</th>
+                <th>Description</th>
+                <th>Submitted Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var report in Model)
+            {
+                <tr>
+                    <td>@report.ReportId</td>
+                    <td>@report.SubmittedBy?.Name</td>
+                    <td>@report.Description</td>
+                    <td>@report.SubmittedAt.ToString("dd/MM/yyyy")</td>
+                    <td>@report.Status</td>
+                    <td>
+                        <a asp-controller="Inspection"
+                           asp-action="Findings"
+                           asp-route-id="@report.ReportId"
+                           class="btn btn-primary btn-sm">
+                            Start Inspection
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
