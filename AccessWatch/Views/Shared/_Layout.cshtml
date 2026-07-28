@@ -31,13 +31,25 @@
                                     <a class="nav-link text-dark" asp-controller="Admin" asp-action="Index">Admin Dashboard</a>
                                 </li>
                             }
-                            else
+                            else if (User.IsInRole("PersonWithDisability"))
                             {
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-controller="Report" asp-action="MyReports">My Reports</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-controller="Report" asp-action="Submit">Report a Barrier</a>
+                                </li>
+                            }
+                            else if (User.IsInRole("AccessibilityInspector"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Inspection" asp-action="Index">Assigned Cases</a>
+                                </li>
+                            }
+                            else if (User.IsInRole("FacilityMaintenanceOfficer"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Facility" asp-action="Index">Repair Tasks</a>
                                 </li>
                             }
                         }
