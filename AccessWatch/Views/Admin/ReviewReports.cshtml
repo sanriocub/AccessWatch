@@ -1,0 +1,50 @@
+﻿@model List<AccessWatch.Models.AccessibilityReport>
+@{
+    ViewData["Title"] = "Review Reports";
+    var inspectors = ViewBag.Inspectors as List<AccessWatch.Models.User>;
+}
+
+<h2>Reports awaiting review</h2>
+
+@if (!Model.Any())
+{
+    <p>Nothing to review right now.</p>
+}
+else
+{
+    @foreach (var report in Model)
+    {
+        <div class="card mb-3 p-3">
+            <p><strong>Submitted by:</strong> @report.SubmittedBy?.Name (@report.SubmittedBy?.Email)</p>
+            <p><strong>Description:</strong> @report.Description</p>
+            <p><strong>Submitted:</strong> @report.SubmittedAt.ToLocalTime().ToString("g")</p>
+            @if (!string.IsNullOrEmpty(report.ImageUrl))
+            {
+                <img src="@report.ImageUrl" style="max-width:200px" class="mb-2" />
+            }
+
+            <div class="d-flex gap-2 align-items-center">
+                <form asp-controller="Admin" asp-action="ApproveAndAssign" method="post" class="d-flex gap-2 align-items-center">
+                    <input type="hidden" name="reportId" value="@report.ReportId" />
+                    <select name="inspectorId" class="form-select" style="width:auto" required>
+                        <option value="">Assign to inspector...</option>
+                        @if (inspectors != null)
+                        {
+                            @foreach (var i in inspectors)
+                            {
+                                <option value="@i.UserId">@i.Name</option>
+                            }
+                        }
+                    </select>
+                    <button type="submit" class="btn btn-success">Approve &amp; assign</button>
+                </form>
+
+                <form asp-controller="Admin" asp-action="RejectReport" method="post"
+                      onsubmit="return confirm('Reject this report?');">
+                    <input type="hidden" name="reportId" value="@report.ReportId" />
+                    <button type="submit" class="btn btn-outline-danger">Reject</button>
+                </form>
+            </div>
+        </div>
+    }
+}

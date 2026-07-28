@@ -1,0 +1,38 @@
+﻿@model List<AccessWatch.Models.AccessibilityReport>
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<h2>Platform Dashboard</h2>
+
+<div class="row mb-4">
+    <div class="col-md-2"><div class="card p-3"><strong>@ViewBag.TotalUsers</strong><br />Users</div></div>
+    <div class="col-md-2"><div class="card p-3"><strong>@ViewBag.TotalReports</strong><br />Total reports</div></div>
+    <div class="col-md-2"><div class="card p-3"><strong>@ViewBag.PendingReview</strong><br />Awaiting review</div></div>
+    <div class="col-md-2"><div class="card p-3"><strong>@ViewBag.InRepair</strong><br />In repair</div></div>
+    <div class="col-md-2"><div class="card p-3"><strong>@ViewBag.Completed</strong><br />Completed</div></div>
+</div>
+
+<p>
+    <a asp-controller="Admin" asp-action="ReviewReports" class="btn btn-primary">Review reports</a>
+    <a asp-controller="Admin" asp-action="ManageUsers" class="btn btn-outline-secondary">Manage users</a>
+    <a asp-controller="Admin" asp-action="ManageCategories" class="btn btn-outline-secondary">Manage categories</a>
+</p>
+
+<h4>Recent activity</h4>
+<table class="table">
+    <thead>
+        <tr><th>Submitted</th><th>By</th><th>Description</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+        @foreach (var r in Model)
+        {
+            <tr>
+                <td>@r.SubmittedAt.ToLocalTime().ToString("g")</td>
+                <td>@r.SubmittedBy?.Name</td>
+                <td>@(r.Description.Length > 50 ? r.Description.Substring(0, 50) + "..." : r.Description)</td>
+                <td><span class="badge bg-secondary">@r.Status</span></td>
+            </tr>
+        }
+    </tbody>
+</table>

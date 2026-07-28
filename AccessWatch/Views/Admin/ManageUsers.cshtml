@@ -1,0 +1,40 @@
+﻿@model List<AccessWatch.Models.User>
+@{
+    ViewData["Title"] = "Manage Users";
+}
+
+<h2>Manage user accounts</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<a asp-controller="Admin" asp-action="CreateUser" class="btn btn-primary mb-3">Create account</a>
+
+<table class="table">
+    <thead>
+        <tr><th>Name</th><th>Email</th><th>Role</th><th>Created</th><th></th></tr>
+    </thead>
+    <tbody>
+        @foreach (var u in Model)
+        {
+            <tr>
+                <td>@u.Name</td>
+                <td>@u.Email</td>
+                <td><span class="badge bg-info text-dark">@u.Role</span></td>
+                <td>@u.CreatedAt.ToLocalTime().ToString("d")</td>
+                <td>
+                    <form asp-controller="Admin" asp-action="DeleteUser" asp-route-id="@u.UserId" method="post"
+                          onsubmit="return confirm('Delete this account?');" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

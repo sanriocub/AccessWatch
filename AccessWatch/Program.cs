@@ -1,5 +1,6 @@
 using AccessWatch.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,5 +42,31 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// Seed the first Platform Administrator account, if one doesn't exist yet.
+// Runs at startup (not via migration HasData) since password hashing needs
+// a random salt each time -- doing it here avoids the non-deterministic model warning.
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AccessWatchDbContext>();
+    db.Database.Migrate(); // applies any pending migrations automatically
+
+    bool adminExists = db.Users.Any(u => u.Role == UserRole.PlatformAdministrator);
+    if (!adminExists)
+    {
+        var hasher = new PasswordHasher<User>();
+        var admin = new User
+        {
+            Name = "System Admin",
+            Email = "admin@accesswatch.com",
+            Role = UserRole.PlatformAdministrator,
+            CreatedAt = DateTime.UtcNow
+        };
+        admin.PasswordHash = hasher.HashPassword(admin, "Admin123!");
+
+        db.Users.Add(admin);
+        db.SaveChanges();
+    }
+}
 
 app.Run();
