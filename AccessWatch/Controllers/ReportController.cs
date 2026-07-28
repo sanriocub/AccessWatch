@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AccessWatch.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "PersonWithDisability")]
     public class ReportController : Controller
     {
         private readonly AccessWatchDbContext _context;
