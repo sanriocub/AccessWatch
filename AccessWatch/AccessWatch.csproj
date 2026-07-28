@@ -10,7 +10,6 @@
     <Folder Include="Controllers\-\" />
     <Folder Include="Views\Inspection\" />
     <Folder Include="Views\Facility\" />
-    <Folder Include="Views\Admin\" />
     <Folder Include="wwwroot\images\" />
     <Folder Include="wwwroot\NewFolder\" />
   </ItemGroup>

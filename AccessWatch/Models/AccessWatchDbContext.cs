@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace AccessWatch.Models
 {
@@ -21,7 +22,6 @@ namespace AccessWatch.Models
         {
             base.OnModelCreating(modelBuilder);
 
-            // One report -> one inspection, one repair (each optional until that stage is reached)
             modelBuilder.Entity<AccessibilityReport>()
                 .HasOne(r => r.Inspection)
                 .WithOne(i => i.Report)
@@ -32,7 +32,6 @@ namespace AccessWatch.Models
                 .WithOne(rep => rep.Report)
                 .HasForeignKey<Repair>(rep => rep.ReportId);
 
-            // Prevent cascade-delete chains across the four FK relationships on User
             modelBuilder.Entity<AccessibilityReport>()
                 .HasOne(r => r.SubmittedBy)
                 .WithMany()
@@ -50,6 +49,8 @@ namespace AccessWatch.Models
                 .WithMany()
                 .HasForeignKey(r => r.AssignedInspectorId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+           
         }
     }
 }

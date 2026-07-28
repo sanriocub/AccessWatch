@@ -1,0 +1,39 @@
+﻿@model List<AccessWatch.Models.Category>
+@{
+    ViewData["Title"] = "Manage Categories";
+}
+
+<h2>Manage accessibility categories</h2>
+
+<form asp-controller="Admin" asp-action="CreateCategory" method="post" class="row g-2 mb-4">
+    <div class="col-md-4">
+        <input name="Name" class="form-control" placeholder="Category name (e.g. Ramp)" required />
+    </div>
+    <div class="col-md-6">
+        <input name="Description" class="form-control" placeholder="Description (optional)" />
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Add</button>
+    </div>
+</form>
+
+<table class="table">
+    <thead>
+        <tr><th>Name</th><th>Description</th><th></th></tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Model)
+        {
+            <tr>
+                <td>@c.Name</td>
+                <td>@c.Description</td>
+                <td>
+                    <form asp-controller="Admin" asp-action="DeleteCategory" asp-route-id="@c.CategoryId" method="post"
+                          onsubmit="return confirm('Delete this category?');" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
