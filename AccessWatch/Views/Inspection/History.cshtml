@@ -1,0 +1,89 @@
+﻿@model IEnumerable<AccessWatch.Models.Inspection>
+
+@{
+    ViewData["Title"] = "Inspection History";
+}
+
+<h2>Inspection History</h2>
+
+<p>View your previously completed accessibility inspections.</p>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        No completed inspections are currently available.
+    </div>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Report ID</th>
+                <th>Submitted By</th>
+                <th>Findings</th>
+                <th>Rating</th>
+                <th>Recommended Action</th>
+                <th>Forwarded</th>
+                <th>Inspection Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var inspection in Model)
+            {
+                <tr>
+                    <td>
+                        @inspection.ReportId
+                    </td>
+
+                    <td>
+                        @inspection.Report?.SubmittedBy?.Name
+                    </td>
+
+                    <td>
+                        @inspection.Findings
+                    </td>
+
+                    <td>
+                        @inspection.AccessibilityRating / 5
+                    </td>
+
+                    <td>
+                        @inspection.RecommendedAction
+                    </td>
+
+                    <td>
+                        @if (inspection.ForwardedForMaintenance)
+                        {
+                            <span class="badge bg-warning text-dark">
+                                Yes
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">
+                                No
+                            </span>
+                        }
+                    </td>
+
+                    <td>
+                        @inspection.InspectedAt?.ToLocalTime().ToString("dd/MM/yyyy hh:mm tt")
+                    </td>
+
+                    <td>
+                        @inspection.Report?.Status
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<a asp-controller="Inspection"
+   asp-action="Index"
+   class="btn btn-secondary">
+    Back to Assigned Cases
+</a>

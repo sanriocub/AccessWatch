@@ -33,17 +33,49 @@ else
             {
                 <tr>
                     <td>@report.ReportId</td>
-                    <td>@report.SubmittedBy?.Name</td>
-                    <td>@report.Description</td>
-                    <td>@report.SubmittedAt.ToString("dd/MM/yyyy")</td>
-                    <td>@report.Status</td>
+
                     <td>
-                        <a asp-controller="Inspection"
-                           asp-action="Findings"
-                           asp-route-id="@report.ReportId"
-                           class="btn btn-primary btn-sm">
-                            Start Inspection
-                        </a>
+                        @report.SubmittedBy?.Name
+                    </td>
+
+                    <td>
+                        @report.Description
+                    </td>
+
+                    <td>
+                        @report.SubmittedAt.ToString("dd/MM/yyyy")
+                    </td>
+
+                    <td>
+                        @report.Status
+                    </td>
+
+                    <td>
+                        @if (report.Status == AccessWatch.Models.ReportStatus.Assigned)
+                        {
+                            <form asp-controller="Inspection"
+                                  asp-action="StartInspection"
+                                  method="post">
+
+                                <input type="hidden"
+                                       name="reportId"
+                                       value="@report.ReportId" />
+
+                                <button type="submit"
+                                        class="btn btn-primary btn-sm">
+                                    Start Inspection
+                                </button>
+                            </form>
+                        }
+                        else if (report.Status == AccessWatch.Models.ReportStatus.InProgress)
+                        {
+                            <a asp-controller="Inspection"
+                               asp-action="Findings"
+                               asp-route-id="@report.ReportId"
+                               class="btn btn-success btn-sm">
+                                Continue Inspection
+                            </a>
+                        }
                     </td>
                 </tr>
             }
