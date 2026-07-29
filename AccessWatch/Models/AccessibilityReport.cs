@@ -6,13 +6,14 @@ namespace AccessWatch.Models
 {
     public enum ReportStatus
     {
-        Submitted,
-        UnderReview,
-        Rejected,
-        Assigned,
-        Inspected,
-        InRepair,
-        Completed
+        Submitted = 0,
+        UnderReview = 1,
+        Rejected = 2,
+        Assigned = 3,
+        Inspected = 4,
+        InRepair = 5,
+        Completed = 6,
+        InProgress = 7
     }
 
     public class AccessibilityReport
