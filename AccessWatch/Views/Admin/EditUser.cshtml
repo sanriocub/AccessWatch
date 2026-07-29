@@ -1,0 +1,43 @@
+﻿@model AccessWatch.ViewModels.EditUserViewModel
+@{
+    ViewData["Title"] = "Edit User";
+}
+
+<h2>Edit account</h2>
+
+<form asp-controller="Admin" asp-action="EditUser" method="post">
+    <input type="hidden" asp-for="UserId" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Role"></label>
+        <select asp-for="Role" class="form-control" asp-items="Html.GetEnumSelectList<AccessWatch.Models.UserRole>()"></select>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="NewPassword"></label>
+        <input asp-for="NewPassword" class="form-control" placeholder="Leave blank to keep current password" />
+        <span asp-validation-for="NewPassword" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save changes</button>
+    <a asp-controller="Admin" asp-action="ManageUsers" class="btn btn-link">Cancel</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

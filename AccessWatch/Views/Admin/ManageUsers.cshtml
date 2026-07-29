@@ -29,6 +29,7 @@
                 <td><span class="badge bg-info text-dark">@u.Role</span></td>
                 <td>@u.CreatedAt.ToLocalTime().ToString("d")</td>
                 <td>
+                    <a asp-controller="Admin" asp-action="EditUser" asp-route-id="@u.UserId" class="btn btn-sm btn-outline-primary">Edit</a>
                     <form asp-controller="Admin" asp-action="DeleteUser" asp-route-id="@u.UserId" method="post"
                           onsubmit="return confirm('Delete this account?');" class="d-inline">
                         <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>

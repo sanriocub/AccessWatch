@@ -82,6 +82,69 @@ namespace AccessWatch.Controllers
             return RedirectToAction(nameof(ManageUsers));
         }
 
+        // GET: /Admin/EditUser/5
+        [HttpGet]
+        public async Task<IActionResult> EditUser(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+                return NotFound();
+
+            var model = new EditUserViewModel
+            {
+                UserId = user.UserId,
+                Name = user.Name,
+                Email = user.Email,
+                Role = user.Role
+            };
+
+            return View(model);
+        }
+
+        // POST: /Admin/EditUser
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditUser(EditUserViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = await _context.Users.FindAsync(model.UserId);
+            if (user == null)
+                return NotFound();
+
+            bool emailTaken = await _context.Users
+                .AnyAsync(u => u.Email == model.Email && u.UserId != model.UserId);
+            if (emailTaken)
+            {
+                ModelState.AddModelError(nameof(model.Email), "That email is already in use by another account.");
+                return View(model);
+            }
+
+            // Stop an admin from demoting themselves out of the only admin account
+            if (user.Role == UserRole.PlatformAdministrator &&
+                model.Role != UserRole.PlatformAdministrator &&
+                await _context.Users.CountAsync(u => u.Role == UserRole.PlatformAdministrator) <= 1)
+            {
+                TempData["Error"] = "Cannot change the role of the only remaining administrator.";
+                return RedirectToAction(nameof(ManageUsers));
+            }
+
+            user.Name = model.Name;
+            user.Email = model.Email;
+            user.Role = model.Role;
+
+            if (!string.IsNullOrWhiteSpace(model.NewPassword))
+            {
+                user.PasswordHash = _passwordHasher.HashPassword(user, model.NewPassword);
+            }
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = $"Updated account for {user.Name}.";
+            return RedirectToAction(nameof(ManageUsers));
+        }
+
         // POST: /Admin/DeleteUser/5
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -95,6 +158,15 @@ namespace AccessWatch.Controllers
                 await _context.Users.CountAsync(u => u.Role == UserRole.PlatformAdministrator) <= 1)
             {
                 TempData["Error"] = "Cannot delete the only remaining administrator account.";
+                return RedirectToAction(nameof(ManageUsers));
+            }
+
+            bool hasReports = await _context.Reports.AnyAsync(r =>
+                r.SubmittedByUserId == id || r.ReviewedByUserId == id || r.AssignedInspectorId == id);
+
+            if (hasReports)
+            {
+                TempData["Error"] = $"Cannot delete {user.Name} — they have reports linked to their account.";
                 return RedirectToAction(nameof(ManageUsers));
             }
 
