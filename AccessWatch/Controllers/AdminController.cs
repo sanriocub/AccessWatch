@@ -23,7 +23,12 @@ namespace AccessWatch.Controllers
         {
             ViewBag.TotalUsers = await _context.Users.CountAsync();
             ViewBag.TotalReports = await _context.Reports.CountAsync();
-            ViewBag.PendingReview = await _context.Reports.CountAsync(r => r.Status == ReportStatus.Submitted);
+            ViewBag.Submitted = await _context.Reports.CountAsync(r => r.Status == ReportStatus.Submitted);
+            ViewBag.UnderReview = await _context.Reports.CountAsync(r => r.Status == ReportStatus.UnderReview);
+            ViewBag.Rejected = await _context.Reports.CountAsync(r => r.Status == ReportStatus.Rejected);
+            ViewBag.Assigned = await _context.Reports.CountAsync(r => r.Status == ReportStatus.Assigned);
+            ViewBag.InProgress = await _context.Reports.CountAsync(r => r.Status == ReportStatus.InProgress);
+            ViewBag.Inspected = await _context.Reports.CountAsync(r => r.Status == ReportStatus.Inspected);
             ViewBag.InRepair = await _context.Reports.CountAsync(r => r.Status == ReportStatus.InRepair);
             ViewBag.Completed = await _context.Reports.CountAsync(r => r.Status == ReportStatus.Completed);
 
