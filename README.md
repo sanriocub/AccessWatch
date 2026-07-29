@@ -68,8 +68,8 @@ AccessWatch/
 |---|---|---|
 | Person with Disability | Abdullah Omar Yusuf | Register/login, update profile, submit accessibility reports with images, track report status |
 | Platform Administrator | Sangeetha Rajsubramanian | Manage user accounts, review/approve/reject reports, assign inspectors, manage categories, monitor activity |
-| Accessibility Inspector | Qusai Nasr Mohammed | View assigned cases, submit inspection findings and ratings, recommend corrective action, forward to maintenance |
-| Facility Maintenance Officer | Omer Abdulaziz Ali Dahesh | View repair tasks, update repair progress, record corrective actions, mark repairs complete |
+| Accessibility Inspector | Omer Abdulaziz Ali Dahesh | View assigned cases, submit inspection findings and ratings, recommend corrective action, forward to maintenance |
+| Facility Maintenance Officer | Qusai Nasr Mohammed | View repair tasks, update repair progress, record corrective actions, mark repairs complete |
 
 **Work only inside your own controller/views folder, and don't edit someone else's role's code without checking with them first.**
 
