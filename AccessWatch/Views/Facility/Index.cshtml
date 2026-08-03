@@ -1,0 +1,68 @@
+@model IEnumerable<AccessWatch.Models.AccessibilityReport>
+
+@{
+    ViewData["Title"] = "Repair Tasks";
+}
+
+<h2>Repair Tasks</h2>
+
+<p>Review forwarded accessibility issues and the inspector's recommended actions.</p>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        No repair tasks are currently available.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Report ID</th>
+                    <th>Submitted By</th>
+                    <th>Issue</th>
+                    <th>Facility</th>
+                    <th>Inspector Recommendation</th>
+                    <th>Progress</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var report in Model)
+                {
+                    <tr>
+                        <td>@report.ReportId</td>
+                        <td>@report.SubmittedBy?.Name</td>
+                        <td class="text-break">@report.Description</td>
+                        <td>@(report.Facility?.Name ?? "Not specified")</td>
+                        <td class="text-break">
+                            @(string.IsNullOrWhiteSpace(report.Inspection?.RecommendedAction)
+                                ? "No recommendation provided"
+                                : report.Inspection.RecommendedAction)
+                        </td>
+                        <td>
+                            @(report.Repair?.Progress.ToString() ?? "NotStarted")
+                        </td>
+                        <td>
+                            <a asp-controller="Facility"
+                               asp-action="UpdateRepair"
+                               asp-route-id="@report.ReportId"
+                               class="btn btn-primary btn-sm">
+                                View and Update
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
