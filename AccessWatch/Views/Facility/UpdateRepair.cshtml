@@ -1,0 +1,151 @@
+@model AccessWatch.ViewModels.UpdateRepairViewModel
+
+@{
+    ViewData["Title"] = "Update Repair";
+    var report = Model.Report;
+}
+
+<h2>Update Repair</h2>
+
+@if (report == null)
+{
+    <div class="alert alert-danger">
+        The repair task could not be loaded.
+    </div>
+}
+else
+{
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Repair Task Details</h5>
+
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Report ID</dt>
+                <dd class="col-sm-9">@report.ReportId</dd>
+
+                <dt class="col-sm-3">Submitted By</dt>
+                <dd class="col-sm-9">@report.SubmittedBy?.Name</dd>
+
+                <dt class="col-sm-3">Issue Description</dt>
+                <dd class="col-sm-9 text-break">@report.Description</dd>
+
+                <dt class="col-sm-3">Facility</dt>
+                <dd class="col-sm-9">@(report.Facility?.Name ?? "Not specified")</dd>
+
+                <dt class="col-sm-3">Category</dt>
+                <dd class="col-sm-9">@(report.Category?.Name ?? "Not specified")</dd>
+
+                <dt class="col-sm-3">Accessibility Rating</dt>
+                <dd class="col-sm-9">
+                    @(report.Inspection?.AccessibilityRating.HasValue == true
+                        ? $"{report.Inspection.AccessibilityRating}/5"
+                        : "Not provided")
+                </dd>
+
+                <dt class="col-sm-3">Inspection Findings</dt>
+                <dd class="col-sm-9 text-break">
+                    @(string.IsNullOrWhiteSpace(report.Inspection?.Findings)
+                        ? "Not provided"
+                        : report.Inspection.Findings)
+                </dd>
+
+                <dt class="col-sm-3">Inspector Recommendation</dt>
+                <dd class="col-sm-9 text-break">
+                    @(string.IsNullOrWhiteSpace(report.Inspection?.RecommendedAction)
+                        ? "No recommendation provided"
+                        : report.Inspection.RecommendedAction)
+                </dd>
+            </dl>
+
+            @if (!string.IsNullOrWhiteSpace(report.ImageUrl))
+            {
+                <div class="mt-3">
+                    <strong>Reported Barrier Photo</strong>
+                    <div class="mt-2">
+                        <a href="@report.ImageUrl" target="_blank" rel="noopener noreferrer">
+                            <img src="@report.ImageUrl"
+                                 alt="Reported accessibility barrier"
+                                 class="img-fluid rounded border"
+                                 style="max-height: 320px;" />
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <form asp-controller="Facility"
+          asp-action="UpdateRepair"
+          method="post"
+          enctype="multipart/form-data">
+
+        <input asp-for="ReportId" type="hidden" />
+
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="mb-3">
+            <label asp-for="Progress" class="form-label">Repair Progress</label>
+            <select asp-for="Progress" class="form-select">
+                <option value="NotStarted">Not Started</option>
+                <option value="InProgress">In Progress</option>
+            </select>
+            <span asp-validation-for="Progress" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="CorrectiveActions" class="form-label">Corrective Actions and Notes</label>
+            <textarea asp-for="CorrectiveActions"
+                      class="form-control"
+                      rows="5"
+                      maxlength="1000"
+                      placeholder="Describe the repair work, actions taken, and relevant notes."></textarea>
+            <span asp-validation-for="CorrectiveActions" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="CompletionEvidence" class="form-label">Repair Evidence Photo</label>
+            <input asp-for="CompletionEvidence"
+                   class="form-control"
+                   type="file"
+                   accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" />
+            <div class="form-text">Accepted formats: JPG, JPEG, PNG, or WEBP. Maximum size: 5 MB.</div>
+            <span asp-validation-for="CompletionEvidence" class="text-danger"></span>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.ExistingCompletionEvidenceUrl))
+        {
+            <div class="mb-3">
+                <strong>Current Repair Evidence</strong>
+                <div class="mt-2">
+                    <a href="@Model.ExistingCompletionEvidenceUrl" target="_blank" rel="noopener noreferrer">
+                        <img src="@Model.ExistingCompletionEvidenceUrl"
+                             alt="Repair evidence"
+                             class="img-fluid rounded border"
+                             style="max-height: 260px;" />
+                    </a>
+                </div>
+            </div>
+        }
+
+        <div class="form-check mb-3">
+            <input asp-for="MarkCompleted" class="form-check-input" />
+            <label asp-for="MarkCompleted" class="form-check-label">
+                Mark this issue as completed
+            </label>
+        </div>
+
+        <button type="submit" class="btn btn-success">
+            Save Repair Update
+        </button>
+
+        <a asp-controller="Facility"
+           asp-action="Index"
+           class="btn btn-secondary">
+            Back to Repair Tasks
+        </a>
+    </form>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
