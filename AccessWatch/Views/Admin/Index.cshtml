@@ -81,7 +81,7 @@
 <h4>Recent activity</h4>
 <table class="table">
     <thead>
-        <tr><th>Submitted</th><th>By</th><th>Description</th><th>Status</th></tr>
+        <tr><th>Submitted</th><th>By</th><th>Description</th><th>Status</th><th></th></tr>
     </thead>
     <tbody>
         @foreach (var r in Model)
@@ -91,6 +91,7 @@
                 <td>@r.SubmittedBy?.Name</td>
                 <td>@(r.Description.Length > 50 ? r.Description.Substring(0, 50) + "..." : r.Description)</td>
                 <td><span class="badge bg-secondary">@r.Status</span></td>
+                <td><a asp-controller="Admin" asp-action="ReportDetails" asp-route-id="@r.ReportId">View</a></td>
             </tr>
         }
     </tbody>
