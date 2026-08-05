@@ -198,6 +198,26 @@ namespace AccessWatch.Controllers
             return View(reports);
         }
 
+        public async Task<IActionResult> ReportDetails(int id)
+        {
+            var report = await _context.Reports
+                .Include(r => r.SubmittedBy)
+                .Include(r => r.ReviewedBy)
+                .Include(r => r.AssignedInspector)
+                .Include(r => r.Facility)
+                .Include(r => r.Category)
+                .Include(r => r.Inspection)
+                .Include(r => r.Repair)
+                    .ThenInclude(rep => rep.MaintenanceOfficer)
+                .FirstOrDefaultAsync(r => r.ReportId == id);
+
+            if (report == null)
+                return NotFound();
+
+            return View(report);
+        }
+
+
         // POST: /Admin/ApproveAndAssign
         [HttpPost]
         [ValidateAntiForgeryToken]
