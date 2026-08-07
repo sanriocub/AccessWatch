@@ -1,0 +1,74 @@
+﻿@model IEnumerable<AccessWatch.Models.Repair>
+
+@{
+    ViewData["Title"] = "Repair History";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+        <h2 class="mb-1">Repair History</h2>
+        <p class="text-muted mb-0">View repair tasks you previously completed.</p>
+    </div>
+
+    <a asp-controller="Facility"
+       asp-action="Index"
+       class="btn btn-outline-secondary">
+        Back to Repair Tasks
+    </a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        No completed repair tasks are currently available in your history.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Report ID</th>
+                    <th>Submitted By</th>
+                    <th>Issue</th>
+                    <th>Facility</th>
+                    <th>Corrective Actions</th>
+                    <th>Completed</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var repair in Model)
+                {
+                    <tr>
+                        <td>@repair.ReportId</td>
+                        <td>@(repair.Report?.SubmittedBy?.Name ?? "Unknown")</td>
+                        <td class="text-break">@(repair.Report?.Description ?? "Not available")</td>
+                        <td>@(repair.Report?.Facility?.Name ?? "Not specified")</td>
+                        <td class="text-break">
+                            @(string.IsNullOrWhiteSpace(repair.CorrectiveActions)
+                                ? "No corrective actions recorded"
+                                : repair.CorrectiveActions)
+                        </td>
+                        <td>
+                            @(repair.CompletedAt?.ToLocalTime().ToString("dd/MM/yyyy hh:mm tt") ?? "Completed")
+                        </td>
+                        <td>
+                            <span class="badge bg-success">Completed</span>
+                        </td>
+                        <td>
+                            <a asp-controller="Facility"
+                               asp-action="HistoryDetails"
+                               asp-route-id="@repair.RepairId"
+                               class="btn btn-primary btn-sm">
+                                View Details
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

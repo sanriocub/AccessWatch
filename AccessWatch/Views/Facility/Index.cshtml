@@ -1,12 +1,21 @@
-@model IEnumerable<AccessWatch.Models.AccessibilityReport>
+﻿@model IEnumerable<AccessWatch.Models.AccessibilityReport>
 
 @{
     ViewData["Title"] = "Repair Tasks";
 }
 
-<h2>Repair Tasks</h2>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+        <h2 class="mb-1">Repair Tasks</h2>
+        <p class="text-muted mb-0">Review forwarded accessibility issues and the inspector's recommended actions.</p>
+    </div>
 
-<p>Review forwarded accessibility issues and the inspector's recommended actions.</p>
+    <a asp-controller="Facility"
+       asp-action="History"
+       class="btn btn-outline-primary">
+        View Repair History
+    </a>
+</div>
 
 @if (TempData["Success"] != null)
 {
