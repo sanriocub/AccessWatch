@@ -29,4 +29,12 @@ namespace AccessWatch.ViewModels
         [Required, DataType(DataType.Password)]
         public string Password { get; set; }
     }
+    public class UpdateProfileViewModel
+    {
+        [Required, StringLength(100)]
+        public string Name { get; set; }
+
+        [Required, EmailAddress]
+        public string Email { get; set; }
+    }
 }
