@@ -1,4 +1,4 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using AccessWatch.Models;
 using AccessWatch.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -47,6 +47,73 @@ namespace AccessWatch.Controllers
                 .ToListAsync();
 
             return View(repairTasks);
+        }
+
+        // View previously completed repair tasks for the signed-in maintenance officer.
+        [HttpGet]
+        public async Task<IActionResult> History()
+        {
+            if (!TryGetCurrentUserId(out int maintenanceOfficerId))
+            {
+                return Forbid();
+            }
+
+            var history = await _context.Repairs
+                .AsNoTracking()
+                .Include(r => r.Report)
+                    .ThenInclude(report => report.SubmittedBy)
+                .Include(r => r.Report)
+                    .ThenInclude(report => report.Facility)
+                .Include(r => r.Report)
+                    .ThenInclude(report => report.Category)
+                .Include(r => r.Report)
+                    .ThenInclude(report => report.Inspection)
+                .Where(r =>
+                    r.MaintenanceOfficerId == maintenanceOfficerId &&
+                    (r.IsCompleted ||
+                     r.CompletedAt != null ||
+                     r.Progress == RepairProgress.Completed ||
+                     r.Report.Status == ReportStatus.Completed))
+                .OrderByDescending(r => r.CompletedAt)
+                .ThenByDescending(r => r.RepairId)
+                .ToListAsync();
+
+            return View(history);
+        }
+
+        // Read-only details for an item in repair history.
+        [HttpGet]
+        public async Task<IActionResult> HistoryDetails(int id)
+        {
+            if (!TryGetCurrentUserId(out int maintenanceOfficerId))
+            {
+                return Forbid();
+            }
+
+            var repair = await _context.Repairs
+                .AsNoTracking()
+                .Include(r => r.Report)
+                    .ThenInclude(report => report.SubmittedBy)
+                .Include(r => r.Report)
+                    .ThenInclude(report => report.Facility)
+                .Include(r => r.Report)
+                    .ThenInclude(report => report.Category)
+                .Include(r => r.Report)
+                    .ThenInclude(report => report.Inspection)
+                .FirstOrDefaultAsync(r =>
+                    r.RepairId == id &&
+                    r.MaintenanceOfficerId == maintenanceOfficerId &&
+                    (r.IsCompleted ||
+                     r.CompletedAt != null ||
+                     r.Progress == RepairProgress.Completed ||
+                     r.Report.Status == ReportStatus.Completed));
+
+            if (repair == null)
+            {
+                return NotFound();
+            }
+
+            return View(repair);
         }
 
         [HttpGet]

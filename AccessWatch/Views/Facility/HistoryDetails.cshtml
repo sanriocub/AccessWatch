@@ -1,0 +1,112 @@
+﻿@model AccessWatch.Models.Repair
+
+@{
+    ViewData["Title"] = "Repair History Details";
+    var report = Model.Report;
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+        <h2 class="mb-1">Repair History Details</h2>
+        <p class="text-muted mb-0">Read-only record of this completed repair task.</p>
+    </div>
+
+    <a asp-controller="Facility"
+       asp-action="History"
+       class="btn btn-outline-secondary">
+        Back to Repair History
+    </a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+            <h5 class="card-title mb-0">Repair Task</h5>
+            <span class="badge bg-success">Completed</span>
+        </div>
+
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Report ID</dt>
+            <dd class="col-sm-9">@Model.ReportId</dd>
+
+            <dt class="col-sm-3">Submitted By</dt>
+            <dd class="col-sm-9">@(report?.SubmittedBy?.Name ?? "Unknown")</dd>
+
+            <dt class="col-sm-3">Issue Description</dt>
+            <dd class="col-sm-9 text-break">@(report?.Description ?? "Not available")</dd>
+
+            <dt class="col-sm-3">Facility</dt>
+            <dd class="col-sm-9">@(report?.Facility?.Name ?? "Not specified")</dd>
+
+            <dt class="col-sm-3">Category</dt>
+            <dd class="col-sm-9">@(report?.Category?.Name ?? "Not specified")</dd>
+
+            <dt class="col-sm-3">Inspector Recommendation</dt>
+            <dd class="col-sm-9 text-break">
+                @(string.IsNullOrWhiteSpace(report?.Inspection?.RecommendedAction)
+                    ? "No recommendation provided"
+                    : report.Inspection.RecommendedAction)
+            </dd>
+
+            <dt class="col-sm-3">Repair Progress</dt>
+            <dd class="col-sm-9">@Model.Progress</dd>
+
+            <dt class="col-sm-3">Corrective Actions</dt>
+            <dd class="col-sm-9 text-break">
+                @(string.IsNullOrWhiteSpace(Model.CorrectiveActions)
+                    ? "No corrective actions recorded"
+                    : Model.CorrectiveActions)
+            </dd>
+
+            <dt class="col-sm-3">Completed At</dt>
+            <dd class="col-sm-9">
+                @(Model.CompletedAt?.ToLocalTime().ToString("dd/MM/yyyy hh:mm tt") ?? "Completed date not recorded")
+            </dd>
+        </dl>
+    </div>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(report?.ImageUrl) || !string.IsNullOrWhiteSpace(Model.CompletionEvidenceUrl))
+{
+    <div class="row g-3 mb-4">
+        @if (!string.IsNullOrWhiteSpace(report?.ImageUrl))
+        {
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Reported Barrier Photo</h5>
+                        <a href="@report.ImageUrl" target="_blank" rel="noopener noreferrer">
+                            <img src="@report.ImageUrl"
+                                 alt="Reported accessibility barrier"
+                                 class="img-fluid rounded border"
+                                 style="max-height: 320px;" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.CompletionEvidenceUrl))
+        {
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Repair Evidence Photo</h5>
+                        <a href="@Model.CompletionEvidenceUrl" target="_blank" rel="noopener noreferrer">
+                            <img src="@Model.CompletionEvidenceUrl"
+                                 alt="Completed repair evidence"
+                                 class="img-fluid rounded border"
+                                 style="max-height: 320px;" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<a asp-controller="Facility"
+   asp-action="History"
+   class="btn btn-secondary">
+    Back to Repair History
+</a>
