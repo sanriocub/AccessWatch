@@ -83,7 +83,10 @@ namespace AccessWatch.Controllers
         // GET: /Report/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            var report = await _context.Reports.FirstOrDefaultAsync(r => r.ReportId == id);
+            var report = await _context.Reports
+                .Include(r => r.Inspection)
+                .Include(r => r.Repair)
+                .FirstOrDefaultAsync(r => r.ReportId == id);
             if (report == null)
                 return NotFound();
 
