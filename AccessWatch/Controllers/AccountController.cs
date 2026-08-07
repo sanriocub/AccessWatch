@@ -100,7 +100,52 @@ namespace AccessWatch.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Index", "Home");
         }
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> UpdateProfile()
+        {
+            var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            int userId = int.Parse(userIdValue);
 
+            var user = await _context.Users.FindAsync(userId);
+
+            var model = new UpdateProfileViewModel
+            {
+                Name = user.Name,
+                Email = user.Email
+            };
+
+            return View(model);
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateProfile(UpdateProfileViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            int userId = int.Parse(userIdValue);
+
+            var user = await _context.Users.FindAsync(userId);
+
+            bool emailTaken = await _context.Users.AnyAsync(u => u.Email == model.Email && u.UserId != userId);
+            if (emailTaken)
+            {
+                ModelState.AddModelError(nameof(model.Email), "An account with this email already exists.");
+                return View(model);
+            }
+
+            user.Name = model.Name;
+            user.Email = model.Email;
+            await _context.SaveChangesAsync();
+
+            await SignInUserAsync(user);
+
+            return RedirectToAction("Index", "Home");
+        }
         [Authorize]
         [HttpGet]
         public IActionResult AccessDenied()
