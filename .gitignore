@@ -365,3 +365,5 @@ wwwroot/uploads/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+appsettings.json
