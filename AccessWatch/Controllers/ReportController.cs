@@ -87,6 +87,7 @@ namespace AccessWatch.Controllers
                 .Include(r => r.Inspection)
                 .Include(r => r.Repair)
                 .FirstOrDefaultAsync(r => r.ReportId == id);
+
             if (report == null)
                 return NotFound();
 
