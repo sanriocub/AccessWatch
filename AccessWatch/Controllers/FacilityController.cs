@@ -1,5 +1,6 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using AccessWatch.Models;
+using AccessWatch.Services;
 using AccessWatch.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -17,11 +18,16 @@ namespace AccessWatch.Controllers
 
         private readonly AccessWatchDbContext _context;
         private readonly IWebHostEnvironment _environment;
+        private readonly ISnsNotificationService _snsNotificationService;
 
-        public FacilityController(AccessWatchDbContext context, IWebHostEnvironment environment)
+        public FacilityController(
+            AccessWatchDbContext context,
+            IWebHostEnvironment environment,
+            ISnsNotificationService snsNotificationService)
         {
             _context = context;
             _environment = environment;
+            _snsNotificationService = snsNotificationService;
         }
 
         public async Task<IActionResult> Index()
@@ -187,6 +193,7 @@ namespace AccessWatch.Controllers
                 return View(model);
             }
 
+            var previousStatus = report.Status;
             var repair = report.Repair;
 
             if (repair == null)
@@ -216,6 +223,15 @@ namespace AccessWatch.Controllers
             }
 
             await _context.SaveChangesAsync();
+
+            if (previousStatus != report.Status && report.Status == ReportStatus.Completed)
+            {
+                await _snsNotificationService.PublishReportStatusChangedAsync(
+                    report,
+                    previousStatus,
+                    report.Status,
+                    HttpContext.RequestAborted);
+            }
 
             TempData["Success"] = model.MarkCompleted
                 ? "The repair task was marked as completed."
