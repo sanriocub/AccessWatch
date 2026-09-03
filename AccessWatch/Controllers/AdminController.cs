@@ -18,7 +18,7 @@ namespace AccessWatch.Controllers
             _context = context;
         }
 
-        // GET: /Admin  -- dashboard / monitor system activity
+        // admin dashboard / monitor system activity
         public async Task<IActionResult> Index()
         {
             ViewBag.TotalUsers = await _context.Users.CountAsync();
@@ -276,7 +276,7 @@ namespace AccessWatch.Controllers
         {
             if (!string.IsNullOrWhiteSpace(model.Name))
             {
-                _context.Categories.Add(new Category { Name = model.Name, Description = model.Description });
+                _context.Categories.Add(new Category { Name = model.Name, Description = model.Description ?? string.Empty });
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(ManageCategories));

@@ -1,3 +1,6 @@
+using Amazon;
+using Amazon.SimpleNotificationService;
+using AccessWatch.Services;
 using AccessWatch.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
@@ -15,6 +18,11 @@ builder.Services.AddHttpClient();
 // (locally this points at your local DB; on AWS it points at RDS)
 builder.Services.AddDbContext<AccessWatchDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("AccessWatchDb")));
+
+var awsRegion = builder.Configuration["AWS:Region"] ?? "us-east-1";
+builder.Services.AddSingleton<IAmazonSimpleNotificationService>(_ =>
+    new AmazonSimpleNotificationServiceClient(RegionEndpoint.GetBySystemName(awsRegion)));
+builder.Services.AddSingleton<ISnsNotificationService, SnsNotificationService>();
 
 // Cookie authentication for register/login/logout
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
