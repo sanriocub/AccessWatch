@@ -367,3 +367,5 @@ wwwroot/uploads/
 FodyWeavers.xsd
 
 appsettings.json
+/AccessWatch/wwwroot/uploads/repairs
+/AccessWatch/wwwroot/uploads
