@@ -8,6 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Register HttpClient for AWS API Gateway communication
+builder.Services.AddHttpClient();
+
 // Register EF Core with the connection string from appsettings.json
 // (locally this points at your local DB; on AWS it points at RDS)
 builder.Services.AddDbContext<AccessWatchDbContext>(options =>
@@ -49,12 +52,14 @@ app.MapControllerRoute(
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AccessWatchDbContext>();
-    db.Database.Migrate(); // applies any pending migrations automatically
+    db.Database.Migrate();
 
     bool adminExists = db.Users.Any(u => u.Role == UserRole.PlatformAdministrator);
+
     if (!adminExists)
     {
         var hasher = new PasswordHasher<User>();
+
         var admin = new User
         {
             Name = "System Admin",
@@ -62,6 +67,7 @@ using (var scope = app.Services.CreateScope())
             Role = UserRole.PlatformAdministrator,
             CreatedAt = DateTime.UtcNow
         };
+
         admin.PasswordHash = hasher.HashPassword(admin, "Admin123!");
 
         db.Users.Add(admin);
