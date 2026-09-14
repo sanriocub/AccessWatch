@@ -41,8 +41,7 @@ namespace AccessWatch.Models
         [ForeignKey(nameof(CategoryId))]
         public Category Category { get; set; }
 
-        public string ImageUrl { get; set; }
-
+        public string? ImageUrl { get; set; }
         public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
 
         public ReportStatus Status { get; set; } = ReportStatus.Submitted;
