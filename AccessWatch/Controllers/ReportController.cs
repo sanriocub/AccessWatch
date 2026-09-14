@@ -19,7 +19,7 @@ namespace AccessWatch.Controllers
 
         // NEW API Gateway endpoint
         private const string AwsImageUploadEndpoint =
-            "https://yd98kpymqg.execute-api.us-east-1.amazonaws.com/upload";
+            "https://xfbtheaieb.execute-api.us-east-1.amazonaws.com/upload";
 
         public ReportController(
             AccessWatchDbContext context,
