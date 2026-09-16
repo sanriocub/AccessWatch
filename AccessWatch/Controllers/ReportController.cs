@@ -13,19 +13,22 @@ namespace AccessWatch.Controllers
     public class ReportController : Controller
     {
         private readonly AccessWatchDbContext _context;
+        private readonly IWebHostEnvironment _env;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<ReportController> _logger;
 
-        //confirm this is the correct, live API Gateway URL 
+        // NEW API Gateway endpoint
         private const string AwsImageUploadEndpoint =
-            "https://yd98kpymqg.execute-api.us-east-1.amazonaws.com/upload";
+            "https://xfbtheaieb.execute-api.us-east-1.amazonaws.com/upload";
 
         public ReportController(
             AccessWatchDbContext context,
+            IWebHostEnvironment env,
             IHttpClientFactory httpClientFactory,
             ILogger<ReportController> logger)
         {
             _context = context;
+            _env = env;
             _httpClientFactory = httpClientFactory;
             _logger = logger;
         }
@@ -56,35 +59,76 @@ namespace AccessWatch.Controllers
         public async Task<IActionResult> Submit(SubmitReportViewModel model)
         {
             if (!ModelState.IsValid)
+            {
                 return View(model);
+            }
 
             string? imageUrl = null;
 
             if (model.Image != null && model.Image.Length > 0)
             {
+                // -------------------------------------------------
+                // 1. Save the image locally
+                // -------------------------------------------------
+
+                var uploadsFolder = Path.Combine(
+                    _env.WebRootPath,
+                    "uploads");
+
+                Directory.CreateDirectory(uploadsFolder);
+
+                var fileName =
+                    $"{Guid.NewGuid()}{Path.GetExtension(model.Image.FileName)}";
+
+                var filePath = Path.Combine(
+                    uploadsFolder,
+                    fileName);
+
+                using (var stream =
+                    new FileStream(filePath, FileMode.Create))
+                {
+                    await model.Image.CopyToAsync(stream);
+                }
+
+                imageUrl = $"/uploads/{fileName}";
+
+                // -------------------------------------------------
+                // 2. Send the same image to AWS
+                // AccessWatch -> API Gateway -> Lambda -> S3
+                // -------------------------------------------------
+
                 try
                 {
-                    imageUrl = await UploadImageToAwsAsync(model.Image);
+                    await UploadImageToAwsAsync(
+                        model.Image,
+                        fileName);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "Image upload to AWS failed for a new report submission.");
-                    ModelState.AddModelError(string.Empty,
-                        "We couldn't upload your image right now. Please try submitting again.");
-                    return View(model);
+                    // Keep the original report submission working
+                    // even if the AWS service is temporarily unavailable.
+                    _logger.LogWarning(
+                        ex,
+                        "The report image was saved locally, but the AWS upload failed.");
                 }
             }
 
             var report = new AccessibilityReport
             {
                 SubmittedByUserId = GetCurrentUserId(),
-                Description = $"{model.Description}\n\nLocation: {model.Location}",
+
+                Description =
+                    $"{model.Description}\n\nLocation: {model.Location}",
+
                 ImageUrl = imageUrl,
+
                 Status = ReportStatus.Submitted,
+
                 SubmittedAt = DateTime.UtcNow
             };
 
             _context.Reports.Add(report);
+
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(MyReports));
@@ -99,25 +143,33 @@ namespace AccessWatch.Controllers
                 .FirstOrDefaultAsync(r => r.ReportId == id);
 
             if (report == null)
+            {
                 return NotFound();
+            }
 
             if (report.SubmittedByUserId != GetCurrentUserId())
+            {
                 return Forbid();
+            }
 
             return View(report);
         }
 
         // ---------------------------------------------------------
-        // Upload image via API Gateway -> Lambda -> S3, returns
-        // the S3 URL from the Lambda's response body.
+        // Upload image to AWS API Gateway
         // ---------------------------------------------------------
-        private async Task<string?> UploadImageToAwsAsync(IFormFile image)
+        private async Task UploadImageToAwsAsync(
+            IFormFile image,
+            string fileName)
         {
-            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}";
-
             using var memoryStream = new MemoryStream();
+
             await image.CopyToAsync(memoryStream);
-            var base64File = Convert.ToBase64String(memoryStream.ToArray());
+
+            var fileBytes = memoryStream.ToArray();
+
+            var base64File =
+                Convert.ToBase64String(fileBytes);
 
             var requestBody = new
             {
@@ -128,22 +180,15 @@ namespace AccessWatch.Controllers
                     : image.ContentType
             };
 
-            var client = _httpClientFactory.CreateClient();
+            var client =
+                _httpClientFactory.CreateClient();
 
-            var response = await client.PostAsJsonAsync(AwsImageUploadEndpoint, requestBody);
+            var response =
+                await client.PostAsJsonAsync(
+                    AwsImageUploadEndpoint,
+                    requestBody);
+
             response.EnsureSuccessStatusCode();
-
-            // ASSUMPTION: Lambda returns JSON like { "url": "https://bucket.s3.amazonaws.com/..." }
-  
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var result = await response.Content.ReadFromJsonAsync<UploadResult>(options);
-
-            return result?.Url;
-        }
-
-        private class UploadResult
-        {
-            public string? Url { get; set; }
         }
 
         // ---------------------------------------------------------
@@ -151,7 +196,10 @@ namespace AccessWatch.Controllers
         // ---------------------------------------------------------
         private int GetCurrentUserId()
         {
-            var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var idClaim =
+                User.FindFirstValue(
+                    ClaimTypes.NameIdentifier);
+
             return int.Parse(idClaim!);
         }
     }
