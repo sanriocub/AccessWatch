@@ -140,7 +140,7 @@ namespace AccessWatch.Controllers
 
             if (result?.Bucket != null && result?.Key != null)
             {
-                return $"https://{result.Bucket}.s3.amazonaws.com/{result.Key}";
+                return $"https://{result.Bucket}.s3.us-east-1.amazonaws.com/{result.Key}";
             }
             return null;
         }
