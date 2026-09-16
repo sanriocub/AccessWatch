@@ -138,12 +138,17 @@ namespace AccessWatch.Controllers
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             var result = await response.Content.ReadFromJsonAsync<UploadResult>(options);
 
-            return result?.Url;
+            if (result?.Bucket != null && result?.Key != null)
+            {
+                return $"https://{result.Bucket}.s3.amazonaws.com/{result.Key}";
+            }
+            return null;
         }
 
         private class UploadResult
         {
-            public string? Url { get; set; }
+            public string? Bucket { get; set; }
+            public string? Key { get; set; }
         }
 
         // ---------------------------------------------------------
